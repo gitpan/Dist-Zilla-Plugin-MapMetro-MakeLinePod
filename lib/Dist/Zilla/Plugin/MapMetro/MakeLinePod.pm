@@ -5,7 +5,7 @@ use utf8;
 
 package Dist::Zilla::Plugin::MapMetro::MakeLinePod;
 
-our $VERSION = '0.1002'; # VERSION
+our $VERSION = '0.1100'; # VERSION
 
 use Moose;
 use namespace::sweep;
@@ -13,6 +13,7 @@ use Path::Tiny;
 use List::AllUtils qw/any all uniq/;
 use Types::Standard qw/Str Maybe/;
 use Map::Metro::Shim;
+use syntax 'qs';
 
 use Dist::Zilla::File::InMemory;
 with 'Dist::Zilla::Role::FileGatherer';
@@ -136,10 +137,10 @@ sub make_line_contents {
     my $city = shift;
     my $content = join "\n" => @_;
 
-$content = sprintf q{
+$content = sprintf qs{
  package Map::Metro::Plugin::Map::%s::Lines;
 
- # VERSION
+ our $VERSION = '0.1100'; # VERSION
 
  1;
 
@@ -163,7 +164,7 @@ $content = sprintf q{
 
 }, $city, '_END_', $city, $city, $content, $city, '=cut';
 
-$content =~ s{^ }{}g;
+$content =~ s{^[ \s]+}{}g;
 
 return $content;
 
