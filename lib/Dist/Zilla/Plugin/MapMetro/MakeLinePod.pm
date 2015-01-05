@@ -5,7 +5,7 @@ use utf8;
 
 package Dist::Zilla::Plugin::MapMetro::MakeLinePod;
 
-our $VERSION = '0.1100'; # VERSION
+our $VERSION = '0.1101'; # VERSION
 
 use Moose;
 use namespace::sweep;
@@ -140,7 +140,7 @@ sub make_line_contents {
 $content = sprintf qs{
  package Map::Metro::Plugin::Map::%s::Lines;
 
- our $VERSION = '0.1100'; # VERSION
+ # %s
 
  1;
 
@@ -162,7 +162,7 @@ $content = sprintf qs{
 
  %s
 
-}, $city, '_END_', $city, $city, $content, $city, '=cut';
+}, $city, 'VERSION', '_END_', $city, $city, $content, $city, '=cut';
 
 $content =~ s{^[ \s]+}{}g;
 
