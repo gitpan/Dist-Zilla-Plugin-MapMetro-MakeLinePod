@@ -5,7 +5,7 @@ use utf8;
 
 package Dist::Zilla::Plugin::MapMetro::MakeLinePod;
 
-our $VERSION = '0.1001'; # VERSION
+our $VERSION = '0.1002'; # VERSION
 
 use Moose;
 use namespace::sweep;
@@ -136,32 +136,37 @@ sub make_line_contents {
     my $city = shift;
     my $content = join "\n" => @_;
 
-return sprintf q{
-package Map::Metro::Plugin::Map::%s::Lines;
+$content = sprintf q{
+ package Map::Metro::Plugin::Map::%s::Lines;
 
-# VERSION
+ # VERSION
 
-1;
+ 1;
 
-_%s_
+ _%s_
 
-=encoding utf-8
+ =encoding utf-8
 
-=head1 NAME
+ =head1 NAME
 
-Map::Metro::Plugin::Map::%s::Lines - Detailed information about Map::Metro::Plugin::Map::%s
+ Map::Metro::Plugin::Map::%s::Lines - Detailed information about Map::Metro::Plugin::Map::%s
 
-=head1 LINES
+ =head1 LINES
 
-%s
+ %s
 
-=head1 SEE ALSO
+ =head1 SEE ALSO
 
-L<Map::Metro::Plugin::Map::%s>
+ L<Map::Metro::Plugin::Map::%s>
 
-%s
+ %s
 
 }, $city, '_END_', $city, $city, $content, $city, '=cut';
+
+$content =~ s{^ }{}g;
+
+return $content;
+
 }
 
 __PACKAGE__->meta->make_immutable;

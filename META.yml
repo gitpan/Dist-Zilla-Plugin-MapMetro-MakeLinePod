@@ -1,5 +1,5 @@
 ---
-abstract: 'Detailed information about Map::Metro::Plugin::Map::%s'
+abstract: 'Automatically include line and station information'
 author:
   - 'Erik Carlsson <info@code301.com>'
 build_requires:
@@ -34,4 +34,4 @@ resources:
   bugtracker: https://github.com/Csson/p5-Dist-Zilla-Plugin-MapMetro-MakeLinePod/issues
   homepage: https://github.com/Csson/p5-Dist-Zilla-Plugin-MapMetro-MakeLinePod
   repository: https://github.com/Csson/p5-Dist-Zilla-Plugin-MapMetro-MakeLinePod.git
-version: '0.1001'
+version: '0.1002'
