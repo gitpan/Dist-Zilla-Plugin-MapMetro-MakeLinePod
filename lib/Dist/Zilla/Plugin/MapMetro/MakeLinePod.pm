@@ -5,7 +5,7 @@ use utf8;
 
 package Dist::Zilla::Plugin::MapMetro::MakeLinePod;
 
-our $VERSION = '0.1101'; # VERSION
+our $VERSION = '0.1200'; # VERSION
 
 use Moose;
 use namespace::sweep;
@@ -13,6 +13,7 @@ use Path::Tiny;
 use List::AllUtils qw/any all uniq/;
 use Types::Standard qw/Str Maybe/;
 use Map::Metro::Shim;
+use syntax 'qi';
 use syntax 'qs';
 
 use Dist::Zilla::File::InMemory;
@@ -48,6 +49,10 @@ sub gather_files {
     LINE:
     foreach my $line ($graph->all_lines) {
 
+        my $css_line_id = $line->description;
+        $css_line_id =~ s{ }{-}g;
+        $css_line_id =~ s{[^a-z0-9_-]}{}ig;
+
         my @stations = $graph->filter_stations(sub {
             my $station = $_;
             return any { $_->id eq $line->id } $station->all_lines;
@@ -75,14 +80,23 @@ sub gather_files {
                                (sort { $b->step_count <=> $a->step_count } @routes)[0, 1]
                             )[0];
 
+        my $longest_station_name_length = length ((sort { length $b->name <=> length $a->name } @stations)[0]->name);
+
         my @station_pod;
         foreach my $step ($chosen_route->all_steps) {
             my @change_to_strings = $self->make_change_to_string($graph, $step->origin_line_station);
-            push @station_pod => (' ' x 4) . join ' ' => $step->origin_line_station->station->name, @change_to_strings;
+            if(scalar @change_to_strings) {
+                unshift @change_to_strings => ' ' x ($longest_station_name_length - length $step->origin_line_station->station->name);
+            }
+            push @station_pod => (' ' x 5) . join ' ' => $step->origin_line_station->station->name, @change_to_strings;
 
             if(!$step->has_next_step) {
                 @change_to_strings = $self->make_change_to_string($graph, $step->destination_line_station);
-                push @station_pod => (' ' x 4) .  join ' ' => $step->destination_line_station->station->name, @change_to_strings;
+                if(scalar @change_to_strings) {
+                    unshift @change_to_strings => ' ' x ($longest_station_name_length - length $step->destination_line_station->station->name);
+                }
+
+                push @station_pod => (' ' x 5) .  join ' ' => $step->destination_line_station->station->name, @change_to_strings;
             }
         }
 
@@ -90,6 +104,14 @@ sub gather_files {
                                                               $chosen_route->get_step(0)->origin_line_station->station->name,
                                                               $chosen_route->get_step(-1)->destination_line_station->station->name,
                                                               $line->name;
+        my $css_color = $line->color;
+        push @linepod => qq{
+            =begin HTML
+
+            <div style="background-color: $css_color; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%%;"></div>
+
+            =end HTML
+        };
 
         push @linepod => '', @station_pod, '';
 
@@ -137,34 +159,35 @@ sub make_line_contents {
     my $city = shift;
     my $content = join "\n" => @_;
 
-$content = sprintf qs{
- package Map::Metro::Plugin::Map::%s::Lines;
+$content = sprintf qqi{
+ package Map::Metro::Plugin::Map::${city}::Lines;
 
  # %s
 
  1;
 
- _%s_
+ # %s: Lines and stations in the $city map
 
- =encoding utf-8
+ __%s__
 
- =head1 NAME
-
- Map::Metro::Plugin::Map::%s::Lines - Detailed information about Map::Metro::Plugin::Map::%s
+ =pod
 
  =head1 LINES
 
- %s
+ $content
 
  =head1 SEE ALSO
 
- L<Map::Metro::Plugin::Map::%s>
+ =for :list
+ * L<Map::Metro::Plugin::Map::$city>
+ * L<Task::MapMetro::Maps>
+ * L<Map::Metro>
 
- %s
+ =cut
 
-}, $city, 'VERSION', '_END_', $city, $city, $content, $city, '=cut';
+}, 'VERSION', 'ABSTRACT', 'END';
 
-$content =~ s{^[ \s]+}{}g;
+$content =~ s{\s+=(begin|end)}{\n\n=$1}g;
 
 return $content;
 
@@ -172,15 +195,23 @@ return $content;
 
 __PACKAGE__->meta->make_immutable;
 
+# ABSTRACT: Automatically include line and station info in Map::Metro map
+
 1;
 
 __END__
 
-=encoding utf-8
+=pod
+
+=encoding UTF-8
 
 =head1 NAME
 
-Dist::Zilla::Plugin::MapMetro::MakeLinePod - Automatically include line and station information
+Dist::Zilla::Plugin::MapMetro::MakeLinePod - Automatically include line and station info in Map::Metro map
+
+=head1 VERSION
+
+Version 0.1200, released 2015-01-07.
 
 =head1 SYNOPSIS
 
@@ -193,25 +224,43 @@ This L<Dist::Zilla> plugin creates a C<::Lines> pod detailing all lines, station
 
 =head1 SEE ALSO
 
+=over 4
+
+=item *
+
 L<Task::MapMetro::Dev> - Map::Metro development tools
+
+=item *
 
 L<Map::Metro::Plugin::Map::Barcelona::Lines> - An example
 
+=item *
+
 L<Map::Metro>
+
+=item *
 
 L<Map::Metro::Plugin::Map>
 
+=back
+
+=head1 SOURCE
+
+L<https://github.com/Csson/p5-Dist-Zilla-Plugin-MapMetro-MakeLinePod>
+
+=head1 HOMEPAGE
+
+L<https://metacpan.org/release/Dist-Zilla-Plugin-MapMetro-MakeLinePod>
+
 =head1 AUTHOR
 
-Erik Carlsson E<lt>info@code301.comE<gt>
+Erik Carlsson <info@code301.com>
 
-=head1 COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-Copyright 2015 - Erik Carlsson
+This software is copyright (c) 2015 by Erik Carlsson <info@code301.com>.
 
-=head1 LICENSE
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

@@ -5,6 +5,7 @@ LICENSE
 MANIFEST
 META.json
 META.yml
+README
 cpanfile
 dist.ini
 lib/Dist/Zilla/Plugin/MapMetro/MakeLinePod.pm
@@ -12,4 +13,5 @@ t/author-eof.t
 t/author-eol.t
 t/author-no-tabs.t
 t/basic.t
+t/release-kwalitee.t
 t/release-pod-syntax.t

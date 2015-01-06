@@ -1,5 +1,5 @@
 ---
-abstract: 'Automatically include line and station information'
+abstract: 'Automatically include line and station info in Map::Metro map'
 author:
   - 'Erik Carlsson <info@code301.com>'
 build_requires:
@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.039'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.029, Dist::Iller version 0.1002, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.143240'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,12 +27,14 @@ requires:
   Map::Metro: '0.2100'
   Moose: '2.0000'
   Path::Tiny: '0'
+  Syntax::Feature::Qi: '0'
   Syntax::Feature::Qs: '0'
   Types::Standard: '0'
   namespace::sweep: '0'
   perl: '5.014000'
+  syntax: '0'
 resources:
   bugtracker: https://github.com/Csson/p5-Dist-Zilla-Plugin-MapMetro-MakeLinePod/issues
-  homepage: https://github.com/Csson/p5-Dist-Zilla-Plugin-MapMetro-MakeLinePod
+  homepage: https://metacpan.org/release/Dist-Zilla-Plugin-MapMetro-MakeLinePod
   repository: https://github.com/Csson/p5-Dist-Zilla-Plugin-MapMetro-MakeLinePod.git
-version: '0.1101'
+version: '0.1200'
